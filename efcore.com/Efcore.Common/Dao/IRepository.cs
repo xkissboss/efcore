@@ -86,14 +86,14 @@ namespace Efcore.Common.Dao
         TEntity GetNoTracking(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> GetNoTrackingAsync(Expression<Func<TEntity, bool>> predicate);
         /// <summary>
-        /// 删除
+        /// 删除（没有对应的记录会报错）
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="autoSave"></param>
         /// <returns></returns>
         bool Delete(TEntity entity, bool autoSave = true);
         /// <summary>
-        /// 异步删除
+        /// 异步删除（没有对应的记录会报错）
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="autoSave"></param>
@@ -105,14 +105,14 @@ namespace Efcore.Common.Dao
         /// <param name="entities"></param>
         /// <param name="autoSave"></param>
         /// <returns></returns>
-        bool SaveList(List<TEntity> entities, bool autoSave = true);
+        bool InsertList(List<TEntity> entities, bool autoSave = true);
         /// <summary>
         /// 异步保存列表
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="autoSave"></param>
         /// <returns></returns>
-        Task<bool> SaveListAsync(List<TEntity> entities, bool autoSave = true);
+        Task<bool> InsertListAsync(List<TEntity> entities, bool autoSave = true);
         /// <summary>
         /// 更新列表
         /// </summary>

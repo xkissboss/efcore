@@ -117,7 +117,7 @@ namespace Efcore.Common.Dao
         public virtual bool Delete(TEntity entity, bool autoSave = true)
         {
             if (entity == null) return false;
-            context.Set<TEntity>().Attach(entity);
+            context.Set<TEntity>().Attach(entity); // 这种情况如果没存在则会报错
             context.Set<TEntity>().Remove(entity);
 
             if (autoSave)
@@ -137,7 +137,7 @@ namespace Efcore.Common.Dao
                 return false;
         }
 
-        public virtual bool SaveList(List<TEntity> entities, bool autoSave = true)
+        public virtual bool InsertList(List<TEntity> entities, bool autoSave = true)
         {
             if (entities == null || entities.Count == 0) return false;
 
@@ -153,7 +153,7 @@ namespace Efcore.Common.Dao
         }
 
 
-        public virtual async Task<bool> SaveListAsync(List<TEntity> entities, bool autoSave = true)
+        public virtual async Task<bool> InsertListAsync(List<TEntity> entities, bool autoSave = true)
         {
             if (entities == null || entities.Count == 0) return false;
 
