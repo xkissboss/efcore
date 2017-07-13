@@ -71,7 +71,7 @@ namespace Efcore.Common.Dao
                 return false;
         }
 
-        public virtual bool SaveOrUpdate(TEntity entity, bool autoSave = true)
+        public virtual bool InsertOrUpdate(TEntity entity, bool autoSave = true)
         {
             if (Get(entity.Id) != null)
                 return Update(entity, autoSave);
@@ -84,7 +84,7 @@ namespace Efcore.Common.Dao
         /// <param name="IsSave">是否增加</param>
         /// <param name="IsCommit">是否提交（默认提交）</param>
         /// <returns></returns>
-        public virtual async Task<bool> SaveOrUpdateAsync(TEntity entity, bool autoSave = true)
+        public virtual async Task<bool> InsertOrUpdateAsync(TEntity entity, bool autoSave = true)
         {
             if ((await GetAsync(entity.Id)) != null)
                 return await UpdateAsync(entity, autoSave);
@@ -356,6 +356,48 @@ namespace Efcore.Common.Dao
         }
 
 
+        public virtual List<TEntity> Get(List<TPrimaryKey> keyList)
+        {
+            if (keyList == null || keyList.Count() < 1) return null;
+
+            return context.Set<TEntity>().Where(d => keyList.Contains(d.Id)).ToList();
+        }
+
+
+        public virtual async Task<List<TEntity>> GetAsync(List<TPrimaryKey> keyList)
+        {
+            return await Task.Run(() => Get(keyList));
+        }
+
+        public virtual bool Delete(TPrimaryKey id, bool autoSave = true)
+        {
+            TEntity t = Get(id);
+            if (t == null) return false;
+            return Delete(t, autoSave);
+        }
+
+        public virtual async Task<bool> DeleteAsync(TPrimaryKey id, bool autoSave = true)
+        {
+            TEntity t = await GetAsync(id);
+            if (t == null) return false;
+            return await DeleteAsync(t, autoSave);
+        }
+
+        public virtual bool DeleteByPks(List<TPrimaryKey> keyList, bool autoSave = true)
+        {
+            List<TEntity> resultList = Get(keyList);
+            if (resultList == null || resultList.Count() < 1)
+                return false;
+            return DeleteList(resultList, autoSave);
+        }
+
+        public virtual async Task<bool> DeleteByPksAsync(List<TPrimaryKey> keyList, bool autoSave = true)
+        {
+            List<TEntity> resultList = await GetAsync(keyList);
+            if (resultList == null || resultList.Count() < 1)
+                return false;
+            return await DeleteListAsync(resultList, autoSave);
+        }
 
 
         public virtual int Save()
@@ -366,6 +408,15 @@ namespace Efcore.Common.Dao
         public virtual async Task<int> SaveAsync()
         {
             return await context.SaveChangesAsync();
+        }
+    }
+
+
+    public abstract class Repository<TEntity> : Repository<TEntity, Int64> where TEntity : BaseEntity
+    {
+         public Repository(ApplicationDbContext context) : base(context)
+        {
+
         }
     }
 }
