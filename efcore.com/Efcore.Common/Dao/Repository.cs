@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
@@ -315,6 +316,47 @@ namespace Efcore.Common.Dao
         {
             return await Task.Run(() => context.Database.ExecuteSqlCommand(sql, para) > 0);
         }
+
+
+
+        public virtual PagedResult<TEntity> LoadPageList(int startPage, int pageSize, Expression<Func<TEntity, bool>> where = null, Expression<Func<TEntity, object>> order = null)
+        {
+
+            if (startPage < 1) startPage = 1;
+            if (pageSize < 1) pageSize = 15;
+            var result = from p in context.Set<TEntity>()
+                         select p;
+            if (where != null)
+                result = result.Where(where);
+            if (order != null)
+                result = result.OrderBy(order);
+            else
+                result = result.OrderBy(m => m.Id);
+
+            return result.PageResult<TEntity>(startPage, pageSize);
+        }
+
+
+
+        public IQueryable<TEntity> LoadPageList(int startPage, int pageSize, out int rowCount, Expression<Func<TEntity, bool>> where = null, Expression<Func<TEntity, object>> order = null)
+        {
+
+            if (startPage < 1) startPage = 1;
+            if (pageSize < 1) pageSize = 15;
+            var result = from p in context.Set<TEntity>()
+                         select p;
+            if (where != null)
+                result = result.Where(where);
+            if (order != null)
+                result = result.OrderBy(order);
+            else
+                result = result.OrderBy(m => m.Id);
+            rowCount = result.Count();
+            return result.Skip((startPage - 1) * pageSize).Take(pageSize);
+        }
+
+
+
 
         public virtual int Save()
         {
